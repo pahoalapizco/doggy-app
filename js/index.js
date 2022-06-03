@@ -17,7 +17,7 @@ const reloadImages = async () => {
 
       figure.innerHTML = `
         <img src="${url}" alt="doggy dog">
-        <button class="btn-favorite">
+        <button class="btn-favorite" onClick="addToFavorites('${id}')">
           <span> <i class="fa-solid fa-heart"></i> </span> 
         </button>
       `;
@@ -26,9 +26,63 @@ const reloadImages = async () => {
     randomContainer.append(...figuresElements);
 
   } catch (error) {
-    console.error(error);
+    console.error("⚠ ~ error", error);
   }
 }
 
 
+const reloadFavorites = async () => {
+  const apiUrl = `${API}/favourites?api_key=${API_KEY}`;
+  try {
+    const resp = await fetch(apiUrl);
+    const data = await resp.json();
+    favoritesContainer.innerHTML = "";
+    
+    if(data.length > 0) {
+      const figuresElements = [];
+
+      data.forEach(({ image }) => {
+        const { id, url } = image;
+        const figure = document.createElement("figure");
+        figure.classList.add('favorite-dog');
+  
+        figure.innerHTML = `
+          <img src="${url}" alt="doggy dog">
+          <button class="btn-favorite remove-favorite">
+            <span> <i class="fa-solid fa-heart"></i> </span>            
+          </button>
+        `;
+        figuresElements.push(figure);
+      });
+      favoritesContainer.append(...figuresElements);      
+    } else {    
+      favoritesContainer.innerHTML = "";
+    }
+  } catch (error) {
+    console.error("⚠ ~ error", error);
+  }
+}
+
+const addToFavorites = async (id) => {
+  try {
+    const apiUrl = `${API}/favourites`
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY,      
+      },
+      body: JSON.stringify({
+        image_id: id
+      }),
+    };
+  
+    await fetch(apiUrl, options);
+    await reloadFavorites();
+  } catch (error) {
+    console.error("⚠ ~ error", error);    
+  }
+}
+
 reloadImages();
+reloadFavorites();
