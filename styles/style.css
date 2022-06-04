@@ -38,7 +38,9 @@ button:hover {
 
 /* Main */
 main {
-  width: 80%;
+  width: 100%;
+  max-width: 700px;
+  min-height: 320px;
   height: 80vh;
   margin: 20px auto;
 }

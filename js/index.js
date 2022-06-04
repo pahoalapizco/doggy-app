@@ -1,4 +1,4 @@
-const LIMIT = 10;
+const LIMIT = 8;
 const API = `https://api.thedogapi.com/v1`;
 
 const randomContainer = document.getElementById("random-doggies-images");
@@ -30,7 +30,6 @@ const reloadImages = async () => {
   }
 }
 
-
 const reloadFavorites = async () => {
   const apiUrl = `${API}/favourites?api_key=${API_KEY}`;
   try {
@@ -41,14 +40,14 @@ const reloadFavorites = async () => {
     if(data.length > 0) {
       const figuresElements = [];
 
-      data.forEach(({ image }) => {
-        const { id, url } = image;
+      data.forEach(({ id, image }) => {
+        const { url } = image;
         const figure = document.createElement("figure");
         figure.classList.add('favorite-dog');
   
         figure.innerHTML = `
           <img src="${url}" alt="doggy dog">
-          <button class="btn-favorite remove-favorite">
+          <button class="btn-favorite remove-favorite" onClick="removeToFavorites('${id}')">
             <span> <i class="fa-solid fa-heart"></i> </span>            
           </button>
         `;
@@ -78,6 +77,21 @@ const addToFavorites = async (id) => {
     };
   
     await fetch(apiUrl, options);
+    await reloadFavorites();
+  } catch (error) {
+    console.error("⚠ ~ error", error);    
+  }
+}
+
+const removeToFavorites = async (id) => {
+  try {
+    const apiUrl = `${API}/favourites/${id}?api_key=${API_KEY}`
+    const options = {
+      method: "DELETE",
+    };
+  
+    const resp = await fetch(apiUrl, options);
+    const data = await resp.json();
     await reloadFavorites();
   } catch (error) {
     console.error("⚠ ~ error", error);    
